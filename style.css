@@ -56,3 +56,33 @@ body {
 .controls button:hover {
     background-color: #eee;
 }
+#toast-container {
+    height: 50px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.toast {
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    animation: fadeInOut 2s forwards;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(10px); }
+    15% { opacity: 1; transform: translateY(0); }
+    85% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Дұрыс табылған қатардың анимациясы */
+.correct {
+    transition: all 0.5s ease-in-out;
+    transform: scale(1.05);
+}
