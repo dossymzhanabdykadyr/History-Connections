@@ -1,7 +1,9 @@
 let selectedWords = [];
 let correctGroups = 0;
 let todayData = null;
-let guessHistory = []; // Бұрынғы жауаптарды сақтау үшін
+let guessHistory = [];
+let startTime, timerInterval;
+let resultsEmoji = []; // Түсті квадраттарды сақтау үшін
 
 async function loadGame() {
     try {
@@ -11,7 +13,21 @@ async function loadGame() {
         todayData = data.find(item => item.date === today) || data[0];
         document.getElementById('date-display').innerText = `Күн: ${todayData.date}`;
         renderBoard();
+        startTimer(); // Ойын басталғанда таймер қосылады
     } catch (e) { console.error("Жүктеу қатесі:", e); }
+}
+
+function startTimer() {
+    startTime = Date.now();
+    timerInterval = setInterval(updateTimer, 1000);
+    document.getElementById('game-stats').style.display = 'block';
+}
+
+function updateTimer() {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+    const secs = (elapsed % 60).toString().padStart(2, '0');
+    document.getElementById('timer-display').innerText = `Уақыт: ${mins}:${secs}`;
 }
 
 function renderBoard() {
@@ -57,7 +73,6 @@ function checkGuess() {
         return;
     }
 
-    // 1. Қайталанған жауапты тексеру
     const currentGuess = selectedWords.map(w => w.text).sort().join(',');
     if (guessHistory.includes(currentGuess)) {
         showToast("Бұл жауап тексерілген!");
@@ -67,42 +82,52 @@ function checkGuess() {
 
     const levels = selectedWords.map(w => w.level);
     
-    // 2. Дұрыс жауапты тексеру
+    // Нәтиже үшін эмодзи қосу
+    const emojis = { 1: '🟨', 2: '🟩', 3: '🟦', 4: '🟪' };
+    resultsEmoji.push(levels.map(l => emojis[l]).join(''));
+
     const allSame = levels.every(l => l === levels[0]);
 
     if (allSame) {
         const category = todayData.categories.find(c => c.level === levels[0]);
         showToast(category.title);
-
         const board = document.getElementById('game-board');
         const solvedRow = document.createElement('div');
         solvedRow.className = `correct-row level-${levels[0]}`;
         solvedRow.innerHTML = `<strong>${category.title}</strong><span style="font-size:12px; margin-top:5px;">${category.words.join(', ')}</span>`;
-        
         document.querySelectorAll('.selected').forEach(el => el.remove());
         board.prepend(solvedRow);
-        
         selectedWords = [];
         correctGroups++;
         
         if (correctGroups === 4) {
-            setTimeout(() => showToast("Керемет! Жаңа ойын ертең 00:00-де шығады!"), 1500);
+            clearInterval(timerInterval); // Таймерді тоқтату
+            showToast("Керемет! Нәтижені бөлісіңіз!");
         }
     } else {
-        // 3. "Бір ғана сөз қате" логикасы
         const counts = {};
         levels.forEach(l => counts[l] = (counts[l] || 0) + 1);
-        const nearMiss = Object.values(counts).some(count => count === 3);
-
-        if (nearMiss) {
+        if (Object.values(counts).some(count => count === 3)) {
             showToast("Бір ғана сөз қате!");
         } else {
             showToast("Байланыс жоқ...");
         }
-
-        // Қате болса таңдауды алып тастау (optional: NYT-да таңдау қала береді, бірақ бізде сілкілеу жоқ болған соң алып тастаған дұрыс)
         document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
         selectedWords = [];
+    }
+}
+
+function shareResult() {
+    const time = document.getElementById('timer-display').innerText;
+    const date = todayData.date;
+    const emojiGrid = resultsEmoji.join('\n');
+    const shareText = `Тарих Connections 🌍\nКүн: ${date}\n${time}\n\n${emojiGrid}\n\nОйнау: ${window.location.href}`;
+
+    if (navigator.share) {
+        navigator.share({ title: 'Тарих Connections', text: shareText });
+    } else {
+        navigator.clipboard.writeText(shareText);
+        showToast("Нәтиже көшірілді! Достарыңызға жіберіңіз.");
     }
 }
 
