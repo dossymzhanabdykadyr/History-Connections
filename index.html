@@ -15,10 +15,15 @@
         
         <div id="game-board" class="grid"></div>
 
-        <div class="controls">
-            <button onclick="checkGuess()">Тексеру</button>
-            <button onclick="shuffleBoard()">Араластыру</button>
-        </div>
+       <div class="controls">
+    <button onclick="checkGuess()">Тексеру</button>
+    <button onclick="shuffleBoard()">Араластыру</button>
+</div>
+
+<div id="game-stats" style="margin-top: 20px; display: none;">
+    <p id="timer-display">Уақыт: 00:00</p>
+    <button id="share-btn" onclick="shareResult()" style="background-color: #333; color: white;">Нәтижені бөлісу 📲</button>
+</div>
         
         <div id="message"></div>
     </div>
