@@ -148,15 +148,29 @@ function finishGame() {
     document.getElementById('game-stats').style.display = 'block';
     
     setTimeout(() => {
+        // Ескі хабарлама блогын тазалаймыз
         const messageDiv = document.getElementById('message');
-        messageDiv.innerHTML = `
-            <div style="background-color: #f8f9fa; border: 2px solid #333; border-radius: 10px; padding: 20px; margin-top: 20px; text-align: center; animation: zoomIn 0.5s ease;">
-                <h3 style="margin: 0 0 10px 0; color: #28a745;">Құттықтаймыз! 🎉</h3>
-                <p style="margin: 0; font-weight: bold;">Ойын аяқталды.</p>
-                <p style="margin: 5px 0 0 0; color: #555;">Келесі ойын түнгі 00:00-де жаңарады.</p>
+        messageDiv.innerHTML = ''; 
+
+        // Жаңа модальді элемент жасаймыз
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        
+        overlay.innerHTML = `
+            <div class="modal-content">
+                <h2 style="margin: 0 0 15px 0; color: #28a745; font-size: 24px;">Құттықтаймыз! 🎉</h2>
+                <div style="font-size: 40px; margin-bottom: 15px;">🏆</div>
+                <p style="margin: 0; font-weight: bold; font-size: 18px;">Ойын аяқталды!</p>
+                <p style="margin: 10px 0 20px 0; color: #555;">Келесі ойын түнгі 00:00-де жаңарады.</p>
+                <button onclick="this.parentElement.parentElement.remove()" 
+                        style="background: #333; color: white; border: none; padding: 10px 25px; border-radius: 10px; cursor: pointer;">
+                    Жабу
+                </button>
             </div>
         `;
-    }, 1000);
+        
+        document.body.appendChild(overlay);
+    }, 800);
 }
 
 function startTimer() {
