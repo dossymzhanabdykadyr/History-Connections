@@ -10,10 +10,21 @@ async function loadGame() {
     try {
         const response = await fetch('data.json');
         const data = await response.json();
-        const today = new Date().toISOString().split('T')[0];
+
+        // Қазақстан уақытын (GMT+5) есептеу
+        const now = new Date();
+        const offset = 5; // Қазақстан уақыт белдеуі
+        const kzTime = new Date(now.getTime() + (offset * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60000));
+        
+        const year = kzTime.getFullYear();
+        const month = String(kzTime.getMonth() + 1).padStart(2, '0');
+        const day = String(kzTime.getDate()).padStart(2, '0');
+        const today = `${year}-${month}-${day}`;
+
+        console.log("Бүгінгі күн (KZ):", today);
+
         // Бүгінгі күнді табамыз, болмаса тізімдегі біріншіні аламыз
         todayData = data.find(d => d.date === today) || data[0];
-
         document.getElementById('date-display').innerText = `Күн: ${todayData.date}`;
         
         // Ойын басталғанда сөздерді алғаш рет араластырып шығарамыз
